@@ -4,7 +4,7 @@ var renderState = function(state) {
 
     d3.select('#state' + state.properties['STATE']).append('h2').text(state.properties['NAME']);
 
-    var size = 500;
+    var size = 1000;
     var svg = d3.select('#state' + state.properties['STATE']).append('svg')
         .attr({
             'width': size,
