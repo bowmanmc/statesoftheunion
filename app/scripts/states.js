@@ -1,11 +1,11 @@
 
-var renderState = function(state) {
-    console.log('Rendering state: ' + state.properties['NAME']);
+var renderState = function(state, geom) {
+    console.log('    rendering state: ' + state);
 
-    d3.select('#state' + state.properties['STATE']).append('h2').text(state.properties['NAME']);
+    d3.select('#state' + state).append('h2').text(state);
 
     var size = 1000;
-    var svg = d3.select('#state' + state.properties['STATE']).append('svg')
+    var svg = d3.select('#state' + state).append('svg')
         .attr({
             'width': size,
             'height': size
@@ -13,11 +13,11 @@ var renderState = function(state) {
     var projection = d3.geo.conicConformal();
     var path = d3.geo.path().projection(projection);
 
-    var centroid = d3.geo.centroid(state);
+    var centroid = d3.geo.centroid(geom);
     var r = [centroid[0] * -1, centroid[1] * -1];
     projection.scale(1).translate([0, 0]).rotate(r);
 
-    var b = path.bounds(state),
+    var b = path.bounds(geom),
         s = 0.95 / Math.max((b[1][0] - b[0][0]) / size, (b[1][1] - b[0][1]) / size),
         t = [(size - s * (b[1][0] + b[0][0])) / 2, (size - s * (b[1][1] + b[0][1])) / 2];
 
@@ -25,33 +25,42 @@ var renderState = function(state) {
 
     // State Outline with our circle fill pattern
     svg.append('path')
-        .datum(state.geometry)
+        .datum(geom)//.features)
         //.enter().append('path')
         .attr({
+            //'id': state,
             'class': 'state',
             'd': path
         });
 };
 
+var loadState = function(st) {
+    console.log('Loading ' + st + '...');
+    $('#maps').append('<div class="state-map" id="state' + st + '"/>');
+    $('#maps').append('<hr />');
+    d3.json('data/' + st + '.json', function(response) {
+        renderState(st, response);
+    });
+};
 
 $(document).ready(function() {
+    var states = [
+        'AL', 'AK', 'AZ', 'AR', 'CA',
+        'CO', 'CT', 'DE', 'FL', 'GA',
+        'HI', 'ID', 'IL', 'IN', 'IA',
+        'KS', 'KY', 'LA', 'ME', 'MD',
+        'MA', 'MI', 'MN', 'MS', 'MO',
+        'MT', 'NE', 'NV', 'NH', 'NJ',
+        'NM', 'NY', 'NC', 'ND', 'OH',
+        'OK', 'OR', 'PA', 'RI', 'SC',
+        'SD', 'TN', 'TX', 'UT', 'VT',
+        'VA', 'WA', 'WV', 'WI', 'WY'];
 
-    d3.json('data/states-5m.json', function(response) {
+    var i, state;
+    var len = states.length;
+    for (i = 0; i < len; i++) {
+        state = states[i];
+        loadState(state);
+    }
 
-        console.log('got the states...');
-        var states = response.features;
-
-        var i, len, state;
-        len = states.length;
-        for (i = 0; i < len; i++) {
-            state = states[i];
-
-            console.log('    adding state: ' + state.properties['NAME'] + ' [' + state.properties['STATE'] + ']');
-
-            $('#maps').append('<div class="state-map" id="state' + state.properties['STATE'] + '"/>');
-            $('#maps').append('<hr />');
-            renderState(state);
-        }
-
-    });
 });
