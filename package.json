@@ -27,6 +27,7 @@
     "grunt-svgmin": "^2.0.0",
     "grunt-usemin": "^3.0.0",
     "grunt-userev": "0.0.6",
+    "phantomjs": "^1.9.16",
     "requirejs": "^2.1.15",
     "time-grunt": "^1.0.0"
   },
